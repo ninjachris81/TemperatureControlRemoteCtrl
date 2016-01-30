@@ -40,7 +40,9 @@ bool ConnectionLogic::updateIncoming() {
 
   if ( conn->available(&pipeNo)){
     conn->read( &broadcastData, sizeof(BroadcastDataStruct) );
-    Serial.println(F("SEND ACK"));
+    #ifdef IS_DEBUG
+      Serial.println(F("SEND ACK"));
+    #endif
     conn->writeAckPayload(pipeNo,&cmdData.cmd, sizeof(CmdStruct) );    
     return true;
  } else {

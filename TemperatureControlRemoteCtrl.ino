@@ -15,12 +15,14 @@
 
 #define MIN_DISTANCE_DURATION 800
 
+#define BROADCAST_TIMEOUT_MS 10000
+
 #ifdef IS_DEBUG
   #define GLOBAL_TIMEOUT_MS 60000   // 1 min
   #define HIGHLIGHT_TIMEOUT_MS 5000
 #else
   #define GLOBAL_TIMEOUT_MS 1200000   // 20 min
-  #define HIGHLIGHT_TIMEOUT_MS 20000
+  #define HIGHLIGHT_TIMEOUT_MS 10000
 #endif
 
 #define CMD_NONE 0
@@ -33,6 +35,7 @@ ConnectionLogic connectionLogic;
 unsigned long startedAtTimeout = 0;
 unsigned long highlightTimeout = 0;
 unsigned long lastDisplayUpdate = 0;
+unsigned long lastBroadcast = 0;
 
 #define STATE_INIT 0
 #define STATE_ENABLED 1
@@ -53,6 +56,7 @@ void setState(uint8_t state) {
       startedAtTimeout = 0;
       connectionLogic.setCmd(CMD_NONE);
       displayLogic.setActive(false);
+      displayLogic.updateConnected(false);
       break;
     case STATE_ENABLED:
       #ifdef IS_DEBUG
@@ -126,6 +130,12 @@ void loop() {
       Serial.println("BROADCAST RECV");
     #endif
     displayLogic.updateTemp(connectionLogic.getBroadcastData().tempWater, connectionLogic.getBroadcastData().tempHC, connectionLogic.getBroadcastData().pumpWater, connectionLogic.getBroadcastData().pumpHC);
+    displayLogic.updateConnected(true);
+    lastBroadcast = millis();
+  } else {
+    if (lastBroadcast==0 || millis() - lastBroadcast > BROADCAST_TIMEOUT_MS) {
+      displayLogic.updateConnected(false);
+    }
   }
 
   // check switch state

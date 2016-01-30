@@ -19,6 +19,8 @@ void DisplayLogic::init() {
   lcd->init();
 
   lcd->createChar(CUSTOM_CHAR_INDEX_DEGREE, degree);
+  lcd->createChar(CUSTOM_CHAR_INDEX_CONNECTED, isConnected);
+  lcd->createChar(CUSTOM_CHAR_INDEX_DISCONNECTED, isDisconnected);
 
   // print static stuff
   lcd->clear();
@@ -29,8 +31,18 @@ void DisplayLogic::init() {
   lcd->print(F("TAUSCH: "));
 }
 
+void DisplayLogic::updateConnected(bool isConnected) {
+  lcd->setCursor(15,0);
+  if (isConnected) {
+    lcd->printByte(CUSTOM_CHAR_INDEX_CONNECTED);
+  } else {
+    lcd->printByte(CUSTOM_CHAR_INDEX_DISCONNECTED);
+  }
+}
+
 void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC) {
 
+#ifdef IS_DEBUG
   Serial.print(F("TEMPW: "));
   Serial.println(tempW);
   Serial.print(F("TEMPHC: "));
@@ -40,7 +52,7 @@ void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC
   Serial.println(pumpWater);
   Serial.print(F("PUMPHC: "));
   Serial.println(pumpHC);
-
+#endif
   
   // update display
   lcd->setCursor(8,0);
@@ -48,9 +60,9 @@ void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC
   lcd->print(tempW);
   lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
   if (pumpHC) {
-    lcd->print(F("  ON "));
+    lcd->print(F(" AN "));
   } else {
-    lcd->print(F("  OFF"));
+    lcd->print(F(" AUS"));
   }
 
   lcd->setCursor(8,1);
@@ -62,8 +74,10 @@ void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC
 void DisplayLogic::updateTimeout(int timeoutSec) {
   if (timeoutSec > 9999) return;
   
+#ifdef IS_DEBUG
   Serial.print(F("TIMEOUT: "));
   Serial.println(timeoutSec);
+#endif
 
   lcd->setCursor(12,1);
   if (timeoutSec<1000) lcd->print(" ");
