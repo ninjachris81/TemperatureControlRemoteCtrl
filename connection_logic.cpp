@@ -38,7 +38,7 @@ void ConnectionLogic::setSleepMode(bool value) {
 bool ConnectionLogic::updateIncoming() {
   byte pipeNo;
 
-  if ( conn->available(&pipeNo)){
+  if ( conn->available(&pipeNo) >= sizeof(BroadcastDataStruct)){
     conn->read( &broadcastData, sizeof(BroadcastDataStruct) );
     #ifdef IS_DEBUG
       Serial.println(F("SEND ACK"));

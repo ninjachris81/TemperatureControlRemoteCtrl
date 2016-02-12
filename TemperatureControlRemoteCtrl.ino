@@ -7,7 +7,7 @@
 #include "display_logic.h"
 #include "connection_logic.h"
 
-//#define IS_DEBUG
+#define IS_DEBUG
 
 #define PIN_SWITCH 6
 #define PIN_ECHO 2 // Echo Pin
@@ -44,6 +44,8 @@ unsigned long lastBroadcast = 0;
 uint8_t currentState = STATE_INIT;
 
 int buttonState = 0;
+
+unsigned long buttonHighStartedAt = 0;
 
 void setState(uint8_t state) {
   currentState = state;
@@ -134,6 +136,7 @@ void loop() {
     lastBroadcast = millis();
   } else {
     if (lastBroadcast==0 || millis() - lastBroadcast > BROADCAST_TIMEOUT_MS) {
+      displayLogic.updateTemp(-1, -1, false, false);
       displayLogic.updateConnected(false);
     }
   }
@@ -141,7 +144,14 @@ void loop() {
   // check switch state
   buttonState = digitalRead(PIN_SWITCH);
   if (buttonState==HIGH) {
-    setState(STATE_ENABLED);
+    if (buttonHighStartedAt==0) buttonHighStartedAt = millis();
+  } else if (buttonHighStartedAt>0) {
+    buttonHighStartedAt = 0;
+    if (millis() - buttonHighStartedAt > 5000) {
+      // settings
+    } else {
+      setState(STATE_ENABLED);
+    }
   }
 
   // check timeout

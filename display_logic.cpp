@@ -22,6 +22,10 @@ void DisplayLogic::init() {
   lcd->createChar(CUSTOM_CHAR_INDEX_CONNECTED, isConnected);
   lcd->createChar(CUSTOM_CHAR_INDEX_DISCONNECTED, isDisconnected);
 
+  printHomeScreen();
+}
+
+void DisplayLogic::printHomeScreen() {
   // print static stuff
   lcd->clear();
   lcd->setCursor(0,0);
@@ -55,20 +59,27 @@ void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC
 #endif
   
   // update display
-  lcd->setCursor(8,0);
-  if (tempW<10) lcd->print(" ");
-  lcd->print(tempW);
-  lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
-  if (pumpHC) {
-    lcd->print(F(" AN "));
+  if (tempW==-1 && tempHC==-1) {
+    lcd->setCursor(8,0);
+    lcd->print("       ");
+    lcd->setCursor(8,1);
+    lcd->print("       ");
   } else {
-    lcd->print(F(" AUS"));
+    lcd->setCursor(8,0);
+    if (tempW<10) lcd->print(" ");
+    lcd->print(tempW);
+    lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
+    if (pumpHC) {
+      lcd->print(F(" AN "));
+    } else {
+      lcd->print(F(" AUS"));
+    }
+  
+    lcd->setCursor(8,1);
+    if (tempHC<10) lcd->print(" ");
+    lcd->print(tempHC);
+    lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
   }
-
-  lcd->setCursor(8,1);
-  if (tempHC<10) lcd->print(" ");
-  lcd->print(tempHC);
-  lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
 }
 
 void DisplayLogic::updateTimeout(int timeoutSec) {
