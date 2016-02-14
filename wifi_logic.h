@@ -9,10 +9,8 @@
 #include "WProgram.h"
 #endif
 
-#define CMD_NONE 0
-#define CMD_SWITCH_ON 1
-
 #define WIFI_CMD_SEND_INTERVAL_MS 10000
+#define WIFI_CHANNEL_SYNC_INTERVAL_MS 60000
 
 // @see MainUnit->http_logic.h->executeData()
 #define FIELD_INDEX_WATER 0
@@ -42,9 +40,10 @@ public:
 private:
   SoftwareSerial *esp;
   unsigned long lastSend = 0;
+  unsigned long lastChannelSync = 0;
   bool isActive = false;
 
-  bool isFirstCheck = true;
+  bool isFirstChannelSync = true;
 
   int broadcastData[DATA_SIZE];
 
@@ -52,7 +51,11 @@ private:
 
   void sendForceCheck();
 
+  void sendChannelSync(bool force);
+
   bool updateBroadcastData();
+
+  void setBroadcastData(String dataString);
 
 };
 

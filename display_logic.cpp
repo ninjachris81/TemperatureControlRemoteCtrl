@@ -85,9 +85,9 @@ void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pump
     lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
 
     lcd->setCursor(7,1);
-    lcd->print(pumpHC ? F("AUS") : F("AN "));
+    lcd->print(pumpHC ? F("AN ") : F("AUS"));
     lcd->print("  ");
-    lcd->print(pumpWater ? F("AUS") : F("AN "));
+    lcd->print(pumpWater ? F("AN ") : F("AUS"));
   }
 }
 

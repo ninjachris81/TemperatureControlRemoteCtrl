@@ -18,18 +18,16 @@ void WifiLogic::init() {
   }
 }
 
-bool WifiLogic::update() {
-  if (isFirstCheck) {
-    sendForceCheck();
-    isFirstCheck = false;
-  }
-    
-  if (lastSend==0 || millis() - lastSend > WIFI_CMD_SEND_INTERVAL_MS) {
-    if (isActive) {
-      sendCmd(F("OVERRIDE"));
-    }
-
+bool WifiLogic::update() {   
+  if (isActive && (lastSend==0 || millis() - lastSend > WIFI_CMD_SEND_INTERVAL_MS)) {
+    sendCmd(F("OVERRIDE"));
     lastSend = millis();
+  }
+
+  if (!isActive && (lastChannelSync==0 || millis() - lastChannelSync > WIFI_CHANNEL_SYNC_INTERVAL_MS)) {
+    sendChannelSync(isFirstChannelSync);
+    isFirstChannelSync = false;
+    lastChannelSync = millis();
   }
 
   // check bc data
@@ -63,31 +61,18 @@ bool WifiLogic::updateBroadcastData() {
       tmp = tmp.substring(6);
       tmp.trim();
 
-      int pos;
-      String val;
-      
+      Serial.print("STATE ");
       Serial.println(tmp);
-
-      for (uint8_t i = 0;i<DATA_SIZE;i++) {
-        pos = tmp.indexOf(',');
-        if (pos>0) {
-          val = tmp.substring(0,pos);
-          tmp = tmp.substring(pos+1);
-          
-          Serial.print("BROADCAST VALUE ");
-          Serial.println(val);
-
-          broadcastData[i] = val.toInt();          
-        } else {
-          // last token
-          broadcastData[i] = tmp.toInt();
-          Serial.print("LBROADCAST VALUE ");
-          Serial.println(broadcastData[i]);
-          tmp = "";
-        }
-      }
+      setBroadcastData(tmp);
       returnVal = true;
-      
+    } else if (tmp.startsWith("TEMP ")) {
+      tmp = tmp.substring(5);
+      tmp.trim();
+
+      Serial.print("TEMP ");
+      Serial.println(tmp);
+      setBroadcastData(tmp);
+      returnVal = true;
     } else {
       Serial.print("Ignoring ");
       Serial.println(tmp);
@@ -97,6 +82,30 @@ bool WifiLogic::updateBroadcastData() {
   return returnVal;
 }
 
+void WifiLogic::setBroadcastData(String dataString) {
+  int pos;
+  String val;
+
+  for (uint8_t i = 0;i<DATA_SIZE;i++) {
+    pos = dataString.indexOf(',');
+    if (pos>0) {
+      val = dataString.substring(0,pos);
+      dataString = dataString.substring(pos+1);
+      
+      Serial.print("BROADCAST VALUE ");
+      Serial.println(val);
+  
+      broadcastData[i] = val.toInt();          
+    } else {
+      // last token
+      broadcastData[i] = dataString.toInt();
+      Serial.print("LBROADCAST VALUE ");
+      Serial.println(broadcastData[i]);
+      dataString = "";
+    }
+  }
+}
+
 void WifiLogic::sendCmd(String cmd) {
   Serial.println("Sending cmd " + cmd);
 
@@ -104,9 +113,17 @@ void WifiLogic::sendCmd(String cmd) {
   esp->println(cmd);
 }
 
+void WifiLogic::sendChannelSync(bool force) {
+  Serial.println("Sending channel sync");
+  if (force) {
+    esp->println(F("HTTP CHANNEL SYNC FORCEµ"));
+  } else {
+    esp->println(F("HTTP CHANNEL SYNC"));
+  }
+}
+
 void WifiLogic::sendForceCheck() {
   Serial.println("Sending forced check");
-
   esp->println(F("HTTP CHECK FORCE"));
 }
 
