@@ -1,0 +1,19 @@
+
+TANK  WT  WASSER
+  VERBINDE...
+
+
+  23°  34°  60°
+STARTE AUS  AUS
+
+  23°  34°  60°
+       AUS  AUS
+   
+  23°  34°  60°
+1200s  AN   AN
+
+
+  23°  34°  60°
+1200s  AN   AN
+
+

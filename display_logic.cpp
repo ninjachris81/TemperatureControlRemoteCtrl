@@ -16,11 +16,12 @@ DisplayLogic::~DisplayLogic() {
 }
 
 void DisplayLogic::init() {
+  Serial.println("DISPLAY INIT");
+
   lcd->init();
 
+  lcd->clear();
   lcd->createChar(CUSTOM_CHAR_INDEX_DEGREE, degree);
-  lcd->createChar(CUSTOM_CHAR_INDEX_CONNECTED, isConnected);
-  lcd->createChar(CUSTOM_CHAR_INDEX_DISCONNECTED, isDisconnected);
 
   printHomeScreen();
 }
@@ -29,26 +30,23 @@ void DisplayLogic::printHomeScreen() {
   // print static stuff
   lcd->clear();
   lcd->setCursor(0,0);
-  lcd->print(F("WASSER: "));
+  lcd->print(F("TANK  WT  WASSER"));
  
   lcd->setCursor(0,1);
-  lcd->print(F("TAUSCH: "));
+  lcd->print(F("   VERBINDE..."));
+  wasHomescreen = true;
 }
 
-void DisplayLogic::updateConnected(bool isConnected) {
-  lcd->setCursor(15,0);
-  if (isConnected) {
-    lcd->printByte(CUSTOM_CHAR_INDEX_CONNECTED);
-  } else {
-    lcd->printByte(CUSTOM_CHAR_INDEX_DISCONNECTED);
-  }
+void DisplayLogic::printStarting() {
+  lcd->setCursor(0,1);
+  lcd->print(F("STARTE"));
 }
 
-void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC) {
+void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pumpWater, bool pumpHC) {
 
 #ifdef IS_DEBUG
   Serial.print(F("TEMPW: "));
-  Serial.println(tempW);
+  Serial.println(tempWater);
   Serial.print(F("TEMPHC: "));
   Serial.println(tempHC);
 
@@ -57,28 +55,55 @@ void DisplayLogic::updateTemp(int tempW, int tempHC, bool pumpWater, bool pumpHC
   Serial.print(F("PUMPHC: "));
   Serial.println(pumpHC);
 #endif
+
+  if (wasHomescreen) {
+    lcd->clear();
+    wasHomescreen = false;
+  }
   
   // update display
-  if (tempW==-1 && tempHC==-1) {
+  if (tempWater==-1 && tempHC==-1) {
+    /*
     lcd->setCursor(8,0);
-    lcd->print("       ");
+    lcd->print("      ");
     lcd->setCursor(8,1);
-    lcd->print("       ");
+    lcd->print("      ");
+    */
   } else {
-    lcd->setCursor(8,0);
-    if (tempW<10) lcd->print(" ");
-    lcd->print(tempW);
+    lcd->setCursor(0,0);
+    
+    lcd->print("  ");
+    printNumber2(tempTank);
     lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
-    if (pumpHC) {
-      lcd->print(F(" AN "));
-    } else {
-      lcd->print(F(" AUS"));
-    }
   
-    lcd->setCursor(8,1);
-    if (tempHC<10) lcd->print(" ");
-    lcd->print(tempHC);
+    lcd->print("  ");
+    printNumber2(tempHC);
     lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
+
+    lcd->print("  ");
+    printNumber2(tempWater);
+    lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
+
+    lcd->setCursor(7,1);
+    lcd->print(pumpHC ? F("AUS") : F("AN "));
+    lcd->print("  ");
+    lcd->print(pumpWater ? F("AUS") : F("AN "));
+  }
+}
+
+void DisplayLogic::printNumber2(uint8_t number) {
+  if (number<10) lcd->print(" ");
+  lcd->print(number);
+}
+
+void DisplayLogic::printNumber4(uint16_t number, bool printZero) {
+  if (number<1000) lcd->print(" ");
+  if (number<100) lcd->print(" ");
+  if (number<10) lcd->print(" ");
+  if (number==0 && !printZero) {
+    lcd->print(" ");
+  } else {
+    lcd->print(number);
   }
 }
 
@@ -90,14 +115,12 @@ void DisplayLogic::updateTimeout(int timeoutSec) {
   Serial.println(timeoutSec);
 #endif
 
-  lcd->setCursor(12,1);
-  if (timeoutSec<1000) lcd->print(" ");
-  if (timeoutSec<100) lcd->print(" ");
-  if (timeoutSec<10) lcd->print(" ");
+  lcd->setCursor(0,1);
   if (timeoutSec==0) {
-    lcd->print("  ");
+    lcd->print("      ");
   } else {
-    lcd->print(timeoutSec);
+    printNumber4(timeoutSec, false);
+    lcd->print("s ");
   }
 }
 
