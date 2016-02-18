@@ -116,7 +116,7 @@ void WifiLogic::sendCmd(String cmd) {
 void WifiLogic::sendChannelSync(bool force) {
   Serial.println("Sending channel sync");
   if (force) {
-    esp->println(F("HTTP CHANNEL SYNC FORCEµ"));
+    esp->println(F("HTTP CHANNEL SYNC FORCE"));
   } else {
     esp->println(F("HTTP CHANNEL SYNC"));
   }
