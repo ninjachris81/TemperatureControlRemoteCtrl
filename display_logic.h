@@ -11,6 +11,8 @@
 
 #define CUSTOM_CHAR_INDEX_DEGREE 0
 
+#define TANK_DEGREE_PLUS 10
+
 class DisplayLogic {
 public:
   DisplayLogic(int maxTimeoutSec);

@@ -73,7 +73,7 @@ void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pump
     lcd->setCursor(0,0);
     
     lcd->print("  ");
-    printNumber2(tempTank);
+    printNumber2(tempTank + TANK_DEGREE_PLUS);
     lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
   
     lcd->print("  ");
