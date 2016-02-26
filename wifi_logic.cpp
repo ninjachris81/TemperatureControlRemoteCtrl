@@ -1,7 +1,7 @@
 #include "wifi_logic.h"
 
 WifiLogic::WifiLogic() {
-  this->esp = new SoftwareSerial(8, 9);
+  this->esp = new SoftwareSerial(PIN_RX, PIN_TX);
 }
 
 WifiLogic::~WifiLogic() {
@@ -16,6 +16,10 @@ void WifiLogic::init() {
   for (uint8_t i=0;i<DATA_SIZE;i++) {
     broadcastData[i] = 0;
   }
+}
+
+bool WifiLogic::isConnected() {
+  return _isConnected;
 }
 
 bool WifiLogic::update() {   
@@ -57,6 +61,11 @@ bool WifiLogic::updateBroadcastData() {
     if (tmp.startsWith("POST OK")) {
       // post ok
       Serial.println("POST OK");
+      _isConnected = true;
+    } else if (tmp.startsWith("CONNECTED")) {
+      _isConnected = true;
+    } else if (tmp.startsWith("DISCONNECTED")) {
+      _isConnected = false;
     } else if (tmp.startsWith("STATE ")) {
       tmp = tmp.substring(6);
       tmp.trim();
@@ -66,6 +75,8 @@ bool WifiLogic::updateBroadcastData() {
       setBroadcastData(tmp);
       returnVal = true;
     } else if (tmp.startsWith("TEMP ")) {
+      _isConnected = true;
+      
       tmp = tmp.substring(5);
       tmp.trim();
 

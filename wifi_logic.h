@@ -22,6 +22,9 @@
 
 #define DATA_SIZE 6
 
+#define PIN_RX 8
+#define PIN_TX 7
+
 class WifiLogic {
 public:
   WifiLogic();
@@ -37,11 +40,15 @@ public:
 
   void forceStop();
 
+  bool isConnected();
+
 private:
   SoftwareSerial *esp;
   unsigned long lastSend = 0;
   unsigned long lastChannelSync = 0;
   bool isActive = false;
+
+  bool _isConnected = false;
 
   bool isFirstChannelSync = true;
 

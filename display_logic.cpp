@@ -22,7 +22,9 @@ void DisplayLogic::init() {
 
   lcd->clear();
   lcd->createChar(CUSTOM_CHAR_INDEX_DEGREE, degree);
-
+  lcd->createChar(CUSTOM_CHAR_INDEX_CONNECTED, isConnected);
+  lcd->createChar(CUSTOM_CHAR_INDEX_DISCONNECTED, isDisconnected);
+  
   printHomeScreen();
 }
 
@@ -42,7 +44,7 @@ void DisplayLogic::printStarting() {
   lcd->print(F("STARTE"));
 }
 
-void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pumpWater, bool pumpHC) {
+void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pumpWater, bool pumpHC, bool isConnected) {
 
 #ifdef IS_DEBUG
   Serial.print(F("TEMPW: "));
@@ -71,8 +73,14 @@ void DisplayLogic::updateTemp(int tempWater, int tempHC, int tempTank, bool pump
     */
   } else {
     lcd->setCursor(0,0);
+
+    if (isConnected) {
+      lcd->printByte(CUSTOM_CHAR_INDEX_CONNECTED);
+    } else {
+      lcd->printByte(CUSTOM_CHAR_INDEX_DISCONNECTED);
+    }
     
-    lcd->print("  ");
+    lcd->print(" ");
     printNumber2(tempTank + TANK_DEGREE_PLUS);
     lcd->printByte(CUSTOM_CHAR_INDEX_DEGREE);
   

@@ -10,6 +10,8 @@
 #endif
 
 #define CUSTOM_CHAR_INDEX_DEGREE 0
+#define CUSTOM_CHAR_INDEX_CONNECTED 1
+#define CUSTOM_CHAR_INDEX_DISCONNECTED 2
 
 #define TANK_DEGREE_PLUS 10
 
@@ -20,7 +22,7 @@ public:
 
   void init();
 
-  void updateTemp(int tempWater, int tempHC, int tempTank, bool pumpWater, bool pumpHC);
+  void updateTemp(int tempWater, int tempHC, int tempTank, bool pumpWater, bool pumpHC, bool isConnected);
 
   void updateTimeout(int timeoutSec);
 
@@ -35,8 +37,8 @@ private:
   bool wasHomescreen = true;
   
   uint8_t degree[8] = {  0xe,0x11,0x11,0xe,0x0,0x0,0x0};
-  //uint8_t isConnected[8] = {  0x0,0x4,0xe,0x1f,0xe,0x4,0x0};
-  //uint8_t isDisconnected[8] = {  0x4,0xe,0x1f,0x0,0x1f,0xe,0x4};
+  uint8_t isConnected[8] = {  0x0,0x4,0xe,0x1f,0xe,0x4,0x0};
+  uint8_t isDisconnected[8] = {  0x4,0xe,0x1f,0x0,0x1f,0xe,0x4};
 
   void printHomeScreen();
 

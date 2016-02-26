@@ -9,7 +9,7 @@
 #include "wifi_logic.h"
 #include "button.h"
 
-#define IS_DEBUG
+//#define IS_DEBUG
 
 #define PIN_BUTTON1 6
 #define PIN_ECHO 2 // Echo Pin
@@ -161,7 +161,7 @@ void loop() {
     #ifdef IS_DEBUG
       Serial.println("BROADCAST RECV");
     #endif
-    displayLogic.updateTemp(wifiLogic.getBroadcastData(FIELD_INDEX_WATER), wifiLogic.getBroadcastData(FIELD_INDEX_HC), wifiLogic.getBroadcastData(FIELD_INDEX_TANK), wifiLogic.getBroadcastData(FIELD_INDEX_PUMP_WATER_ON), wifiLogic.getBroadcastData(FIELD_INDEX_PUMP_HC_ON));
+    displayLogic.updateTemp(wifiLogic.getBroadcastData(FIELD_INDEX_WATER), wifiLogic.getBroadcastData(FIELD_INDEX_HC), wifiLogic.getBroadcastData(FIELD_INDEX_TANK), wifiLogic.getBroadcastData(FIELD_INDEX_PUMP_WATER_ON), wifiLogic.getBroadcastData(FIELD_INDEX_PUMP_HC_ON), wifiLogic.isConnected());
     lastBroadcast = millis();
     setState(STATE_ENABLED);
   } else {
@@ -169,7 +169,7 @@ void loop() {
       #ifdef IS_DEBUG
         Serial.println("BROADCAST TIMEOUT");
       #endif
-      displayLogic.updateTemp(-1, -1, -1, false, false);
+      displayLogic.updateTemp(-1, -1, -1, false, false, wifiLogic.isConnected());
       lastBroadcast = 0;
     }
   }
